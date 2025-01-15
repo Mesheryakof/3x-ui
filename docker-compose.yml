@@ -11,12 +11,14 @@ services:
       - ./nginx/conf/:/etc/nginx/conf.d/:ro
       - ./certbot/conf:/etc/nginx/ssl/:ro
       - ./certbot/www/:/var/www/certbot/:ro
+    network_mode: host
 
   certbot:
     image: certbot/certbot:latest
     volumes:
       - ./certbot/conf/:/etc/letsencrypt/:rw
       - ./certbot/www/:/var/www/certbot/:rw
+    network_mode: host
 
   3x-ui:
     image: ghcr.io/mhsanaei/3x-ui:latest
