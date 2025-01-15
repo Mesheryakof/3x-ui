@@ -1,17 +1,32 @@
----
-version: "3"
-
 services:
+  webserver:
+    image: nginx:latest
+    env_file:
+      - .env
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/conf:/etc/nginx/ssl/:ro
+      - ./certbot/www/:/var/www/certbot/:ro
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+      - ./certbot/www/:/var/www/certbot/:rw
+
   3x-ui:
     image: ghcr.io/mhsanaei/3x-ui:latest
     container_name: 3x-ui
-    hostname: yourhostname
+    env_file:
+      - .env
+    hostname: $HOSTNAME
     volumes:
       - $PWD/db/:/etc/x-ui/
       - $PWD/cert/:/root/cert/
-    environment:
-      XRAY_VMESS_AEAD_FORCED: "false"
-      X_UI_ENABLE_FAIL2BAN: "true"
     tty: true
-    network_mode: host
+    network_mode: bridge
     restart: unless-stopped
