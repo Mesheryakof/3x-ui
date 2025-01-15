@@ -11,14 +11,16 @@ services:
       - ./nginx/conf/:/etc/nginx/conf.d/:ro
       - ./certbot/conf:/etc/nginx/ssl/:ro
       - ./certbot/www/:/var/www/certbot/:ro
-    network_mode: host
+    networks:
+      - vpn
 
   certbot:
     image: certbot/certbot:latest
     volumes:
       - ./certbot/conf/:/etc/letsencrypt/:rw
       - ./certbot/www/:/var/www/certbot/:rw
-    network_mode: host
+    networks:
+      - vpn
 
   3x-ui:
     image: ghcr.io/mhsanaei/3x-ui:latest
@@ -30,5 +32,10 @@ services:
       - $PWD/db/:/etc/x-ui/
       - $PWD/cert/:/root/cert/
     tty: true
-    network_mode: bridge
+    networks:
+      - vpn
     restart: unless-stopped
+
+networks:
+  vpn:
+    driver: bridge
